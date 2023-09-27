@@ -63,7 +63,17 @@ CREATE TABLE products(
     updated_at TIMESTAMP,
     category_id INT,
     FOREIGN KEY (category_id) REFERENCES categories(id)
-)
+);
+
+CREATE TABLE product_images(
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    product_id INT,
+    CONSTRAINT fk_product_images_product_id
+        FOREIGN KEY (product_id) REFERENCES products (id) ON DELETE CASCADE,
+    image_url VARCHAR(300) 
+);
+--ON DELETE CASCADE : bảng products bị xóa thì product_images bị xóa theo
+
 
 --Đặt hàng - orders
 CREATE TABLE orders (

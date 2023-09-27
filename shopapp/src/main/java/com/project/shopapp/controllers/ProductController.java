@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -24,7 +25,7 @@ public class ProductController {
     @PostMapping(value = "", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     //POST http://localhost:8088/v1/api/products
     public ResponseEntity<?> createProduct(
-            @Valid @RequestBody ProductDTO productDTO,
+            @Valid @ModelAttribute ProductDTO productDTO,
             //@RequestPart("file") MultipartFile file,
             BindingResult result
             ){
@@ -33,11 +34,16 @@ public class ProductController {
                 List<String> errorMessages = result.getFieldErrors().stream().map(FieldError::getDefaultMessage).toList();
                 return ResponseEntity.badRequest().body(errorMessages);
             }
-            MultipartFile file = productDTO.getFile();
-            if(file != null){
+            List<MultipartFile> files = productDTO.getFiles();
+            files = files == null ? new ArrayList<MultipartFile>() : files;
+            for(MultipartFile file: files){
+                if(file.getSize()== 0){
+                    continue;
+                }
                 //kiểm tra kích thước file và định dạng
                 if(file.getSize() > 10 * 1024 * 1024){ //kích thước > 10MB
-                    return ResponseEntity.status(HttpStatus.PAYLOAD_TOO_LARGE).body("file is too large! Maximum size is 10MB");
+                    return ResponseEntity.status(HttpStatus.PAYLOAD_TOO_LARGE)
+                            .body("file is too large! Maximum size is 10MB");
                 }
                 String contentType = file.getContentType();
                 if(contentType == null || !contentType.startsWith("image/")){
@@ -46,7 +52,7 @@ public class ProductController {
                 //Lưu file và cập nhật thumbnail trong DTO
                 String filename = storeFile(file); //Thay thế hàm này với code của bạn để lưu file
                 //Lưu vào đối tượng product trong DB => làm sau
-
+                //Lưu vào bảng product_image
             }
 //            {
 //                "name": "iphone",
