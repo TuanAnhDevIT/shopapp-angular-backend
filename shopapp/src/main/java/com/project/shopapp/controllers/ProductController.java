@@ -2,20 +2,30 @@ package com.project.shopapp.controllers;
 
 import com.project.shopapp.dtos.ProductDTO;
 import jakarta.validation.*;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("api/v1/products")
 public class ProductController {
-    @PostMapping("")
+    @PostMapping(value = "", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     //POST http://localhost:8088/v1/api/products
     public ResponseEntity<?> createProduct(
             @Valid @RequestBody ProductDTO productDTO,
+            //@RequestPart("file") MultipartFile file,
             BindingResult result
             ){
         try {
@@ -23,10 +33,49 @@ public class ProductController {
                 List<String> errorMessages = result.getFieldErrors().stream().map(FieldError::getDefaultMessage).toList();
                 return ResponseEntity.badRequest().body(errorMessages);
             }
+            MultipartFile file = productDTO.getFile();
+            if(file != null){
+                //kiểm tra kích thước file và định dạng
+                if(file.getSize() > 10 * 1024 * 1024){ //kích thước > 10MB
+                    return ResponseEntity.status(HttpStatus.PAYLOAD_TOO_LARGE).body("file is too large! Maximum size is 10MB");
+                }
+                String contentType = file.getContentType();
+                if(contentType == null || !contentType.startsWith("image/")){
+                    return ResponseEntity.status(HttpStatus.UNSUPPORTED_MEDIA_TYPE).body("file must be an image");
+                }
+                //Lưu file và cập nhật thumbnail trong DTO
+                String filename = storeFile(file); //Thay thế hàm này với code của bạn để lưu file
+                //Lưu vào đối tượng product trong DB => làm sau
+
+            }
+//            {
+//                "name": "iphone",
+//                    "price": 123,
+//                    "thumbnail":"",
+//                    "description": "this is a test product",
+//                    "category_id": 1
+//            }
             return ResponseEntity.ok("Product created successfully");
         } catch (Exception e){
             return ResponseEntity.badRequest().body(e.getMessage());
         }
+    }
+
+    private String storeFile(MultipartFile file) throws IOException{
+        String fileName = StringUtils.cleanPath(file.getOriginalFilename());
+        //Thêm UUID vào trước tên file để đảm bảo tên file là duy nhất
+        String uniqueFilename = UUID.randomUUID().toString() + "_" + fileName;
+        //Đường dẫn đến thư mục mà bạn muốn lưu file
+        java.nio.file.Path uploadDir = Paths.get("uploads");
+        //kiểm tra và tạo thư mục nếu nó không tồn tại
+        if(!Files.exists(uploadDir)){
+            Files.createDirectories(uploadDir);
+        }
+        //Đường dẫn đầy đủ đến file
+        java.nio.file.Path destinaion = Paths.get(uploadDir.toString(), uniqueFilename);
+        //Sao chép file vào thư mục đích
+        Files.copy(file.getInputStream(), destinaion, StandardCopyOption.REPLACE_EXISTING);
+        return uniqueFilename;
     }
 
     @GetMapping("")
