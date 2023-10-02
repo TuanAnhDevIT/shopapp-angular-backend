@@ -3,7 +3,6 @@ package com.project.shopapp.controllers;
 
 import com.project.shopapp.dtos.*;
 import com.project.shopapp.services.IUserService;
-import com.project.shopapp.services.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
