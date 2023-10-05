@@ -1,4 +1,4 @@
-package com.project.shopapp.services.impls;
+package com.project.shopapp.services;
 
 import com.project.shopapp.dtos.ProductDTO;
 import com.project.shopapp.dtos.ProductImageDTO;
@@ -10,7 +10,7 @@ import com.project.shopapp.models.ProductImage;
 import com.project.shopapp.repositories.CategoryRepository;
 import com.project.shopapp.repositories.ProductImageRepository;
 import com.project.shopapp.repositories.ProductRepository;
-import com.project.shopapp.services.IProductService;
+import com.project.shopapp.responses.ProductResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -18,51 +18,60 @@ import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
-@RequiredArgsConstructor
 @Service
-public class ProductService implements IProductService {
+@RequiredArgsConstructor
+public class ProductService implements IProductService{
     private final ProductRepository productRepository;
     private final CategoryRepository categoryRepository;
     private final ProductImageRepository productImageRepository;
-
     @Override
     public Product createProduct(ProductDTO productDTO) throws DataNotFoundException {
-        Category existingCategory = categoryRepository.findById(productDTO.getCategoryId())
-                .orElseThrow(() -> new DataNotFoundException(
-                        "Cannot find category with id: "+productDTO.getCategoryId()));
+        Category existingCategory = categoryRepository
+                .findById(productDTO.getCategoryId())
+                .orElseThrow(() ->
+                        new DataNotFoundException(
+                                "Cannot find category with id: "+productDTO.getCategoryId()));
+
         Product newProduct = Product.builder()
                 .name(productDTO.getName())
                 .price(productDTO.getPrice())
                 .thumbnail(productDTO.getThumbnail())
+                .description(productDTO.getDescription())
                 .category(existingCategory)
                 .build();
         return productRepository.save(newProduct);
     }
 
     @Override
-    public Product getProductById(Long productId) throws Exception {
+    public Product getProductById(long productId) throws Exception {
         return productRepository.findById(productId).
-                orElseThrow(() -> new DataNotFoundException(
-                        "Cannot find this product with id = " + productId));
+                orElseThrow(()-> new DataNotFoundException(
+                        "Cannot find product with id ="+productId));
     }
 
     @Override
-    public Page<Product> getAllProducts(PageRequest pageRequest) {
+    public Page<ProductResponse> getAllProducts(PageRequest pageRequest) {
         // Lấy danh sách sản phẩm theo trang(page) và giới hạn(limit)
-        return productRepository.findAll(pageRequest);
+        return productRepository
+                .findAll(pageRequest)
+                .map(ProductResponse::fromProduct);
     }
 
     @Override
-    public Product updateProduct(long id, ProductDTO productDTO) throws Exception {
+    public Product updateProduct(
+            long id,
+            ProductDTO productDTO
+    )
+            throws Exception {
         Product existingProduct = getProductById(id);
-        if(existingProduct != null){
-            //Copy các thuộc tính từ DTO -> product
+        if(existingProduct != null) {
+            //copy các thuộc tính từ DTO -> Product
             //Có thể sử dụng ModelMapper
             Category existingCategory = categoryRepository
                     .findById(productDTO.getCategoryId())
-                    .orElseThrow(() -> new DataNotFoundException(
-                            "cannot find category with Id: "+productDTO.getCategoryId()));
-
+                    .orElseThrow(() ->
+                            new DataNotFoundException(
+                                    "Cannot find category with id: "+productDTO.getCategoryId()));
             existingProduct.setName(productDTO.getName());
             existingProduct.setCategory(existingCategory);
             existingProduct.setPrice(productDTO.getPrice());
@@ -71,6 +80,7 @@ public class ProductService implements IProductService {
             return productRepository.save(existingProduct);
         }
         return null;
+
     }
 
     @Override
@@ -83,28 +93,26 @@ public class ProductService implements IProductService {
     public boolean existsByName(String name) {
         return productRepository.existsByName(name);
     }
-
     @Override
     public ProductImage createProductImage(
             Long productId,
-            ProductImageDTO productImageDTO
-    )throws Exception{
+            ProductImageDTO productImageDTO) throws Exception {
         Product existingProduct = productRepository
                 .findById(productId)
-                .orElseThrow(() -> new DataNotFoundException(
-                        "Cannot find product with id: "+productImageDTO.getProductId()));
-        ProductImage newProductImage = ProductImage
-                .builder()
+                .orElseThrow(() ->
+                        new DataNotFoundException(
+                                "Cannot find product with id: "+productImageDTO.getProductId()));
+        ProductImage newProductImage = ProductImage.builder()
                 .product(existingProduct)
                 .imageUrl(productImageDTO.getImageUrl())
                 .build();
-        //không cho insert quá 5 ảnh cho 1 sản phẩm
+        //Ko cho insert quá 5 ảnh cho 1 sản phẩm
         int size = productImageRepository.findByProductId(productId).size();
-        if(size >= 5){
-            throw new InvalidParamException("Number of images must be <= 5");
+        if(size >= ProductImage.MAXIMUM_IMAGES_PER_PRODUCT) {
+            throw new InvalidParamException(
+                    "Number of images must be <= "
+                            +ProductImage.MAXIMUM_IMAGES_PER_PRODUCT);
         }
         return productImageRepository.save(newProductImage);
     }
-
-
 }

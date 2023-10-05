@@ -1,4 +1,4 @@
-package com.project.shopapp.services.impls;
+package com.project.shopapp.services;
 
 import com.project.shopapp.dtos.UserDTO;
 import com.project.shopapp.exceptions.DataNotFoundException;
