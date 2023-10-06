@@ -164,8 +164,6 @@ public class ProductController {
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
-
-
     }
 //    @PostMapping("/generateFakeProducts")
     private ResponseEntity<String> generateFakeProducts() {
