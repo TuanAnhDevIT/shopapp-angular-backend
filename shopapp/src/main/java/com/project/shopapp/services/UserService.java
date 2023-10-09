@@ -43,12 +43,12 @@ public class UserService implements IUserService {
                 .phoneNumber(userDTO.getPhoneNumber())
                 .password((userDTO.getPassword()))
                 .address(userDTO.getAddress())
-                .dateOfBirth((Date) userDTO.getDateOfBirth())
-//                .dateOfBirth(userDTO.getDateOfBirth())
+                .dateOfBirth(userDTO.getDateOfBirth())
                 .facebookAccountId(userDTO.getFacebookAccountId())
                 .googleAccountId(userDTO.getGoogleAccountId())
                 .build();
-        Role role = roleRepository.findById(userDTO.getRoleId()).orElseThrow(()->new DataNotFoundException("Role not found"));
+        Role role = roleRepository.findById(userDTO.getRoleId())
+                .orElseThrow(()->new DataNotFoundException("Role not found"));
         newUser.setRole(role);
 
         //Kiểm tra nếu có UserId => không yêu cầu password
@@ -75,7 +75,8 @@ public class UserService implements IUserService {
             }
         }
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
-                phoneNumber,password
+                phoneNumber,password,
+                existingUser.getAuthorities()
         );
         //authenticate with Java Spring Security
         authenticationManager.authenticate(authenticationToken);
