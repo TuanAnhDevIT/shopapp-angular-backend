@@ -36,16 +36,16 @@ public class User extends BaseEntity implements UserDetails {
     private String password;
 
     @Column(name = "is_active")
-    private boolean active;
+    private Boolean active;
 
     @Column(name = "date_of_birth")
     private Date dateOfBirth;
 
     @Column(name = "facebook_account_id")
-    private int facebookAccountId;
+    private Integer facebookAccountId;
 
     @Column(name = "google_account_id")
-    private int googleAccountId;
+    private Integer googleAccountId;
 
     @ManyToOne
     @JoinColumn(name = "role_id")
@@ -55,7 +55,7 @@ public class User extends BaseEntity implements UserDetails {
     public Collection<? extends GrantedAuthority> getAuthorities() {
         List<SimpleGrantedAuthority> authorityList = new ArrayList<>();
         authorityList.add(new SimpleGrantedAuthority("ROLE_"+getRole().getName().toUpperCase()));
-        //authorityList.add(new SimpleGrantedAuthority("ROLE_ADMIN"));
+//        authorityList.add(new SimpleGrantedAuthority("ROLE_USER"));
 
         return authorityList;
     }
