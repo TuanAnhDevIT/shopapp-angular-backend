@@ -23,6 +23,7 @@ import java.util.List;
 
 @Component
 @RequiredArgsConstructor
+
 public class JwtTokenFilter extends OncePerRequestFilter{
     @Value("${api.prefix}")
     private String apiPrefix;
@@ -66,6 +67,7 @@ public class JwtTokenFilter extends OncePerRequestFilter{
 
     }
     private boolean isBypassToken(@NonNull  HttpServletRequest request) {
+
         final List<Pair<String, String>> bypassTokens = Arrays.asList(
                 Pair.of(String.format("%s/roles", apiPrefix), "GET"),
                 Pair.of(String.format("%s/products", apiPrefix), "GET"),
