@@ -11,7 +11,6 @@ import lombok.*;
 @NoArgsConstructor
 @Builder
 public class SocialAccount {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -27,4 +26,6 @@ public class SocialAccount {
 
     @Column(name = "email", length = 150)
     private String email;
+
 }
+

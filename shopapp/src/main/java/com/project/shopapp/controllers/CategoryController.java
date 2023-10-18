@@ -1,7 +1,7 @@
 package com.project.shopapp.controllers;
 
 import com.project.shopapp.components.LocalizationUtils;
-import com.project.shopapp.dtos.CategoryDTO;
+import com.project.shopapp.dtos.*;
 import com.project.shopapp.models.Category;
 import com.project.shopapp.responses.CategoryResponse;
 import com.project.shopapp.responses.UpdateCategoryResponse;
@@ -29,15 +29,15 @@ public class CategoryController {
     private final CategoryService categoryService;
     private final LocaleResolver localeResolver;
     private final MessageSource messageSource;
-    private LocalizationUtils localizationUtils;
+    private final LocalizationUtils localizationUtils;
+
     @PostMapping("")
-    //Nếu tham số truyền vào là một object thì sao ? => Data Transfer Object = Request Object
+    //Nếu tham số truyền vào là 1 object thì sao ? => Data Transfer Object = Request Object
     public ResponseEntity<CategoryResponse> createCategory(
-            @Valid @RequestBody
-            CategoryDTO categoryDTO,
-            BindingResult result){
+            @Valid @RequestBody CategoryDTO categoryDTO,
+            BindingResult result) {
         CategoryResponse categoryResponse = new CategoryResponse();
-        if(result.hasErrors()){
+        if(result.hasErrors()) {
             List<String> errorMessages = result.getFieldErrors()
                     .stream()
                     .map(FieldError::getDefaultMessage)
@@ -51,12 +51,12 @@ public class CategoryController {
         return ResponseEntity.ok(categoryResponse);
     }
 
-    //Hiển thị tất cả category
-    @GetMapping("") //http://localhost:8088/api/v1/categories?page=1&limit=10
+    //Hiện tất cả các categories
+    @GetMapping("")
     public ResponseEntity<List<Category>> getAllCategories(
-            @RequestParam("page") int page,
-            @RequestParam("limit") int limit
-    ){
+            @RequestParam("page")     int page,
+            @RequestParam("limit")    int limit
+    ) {
         List<Category> categories = categoryService.getAllCategories();
         return ResponseEntity.ok(categories);
     }
@@ -65,16 +65,16 @@ public class CategoryController {
     public ResponseEntity<UpdateCategoryResponse> updateCategory(
             @PathVariable Long id,
             @Valid @RequestBody CategoryDTO categoryDTO
-            ){
+    ) {
         UpdateCategoryResponse updateCategoryResponse = new UpdateCategoryResponse();
         categoryService.updateCategory(id, categoryDTO);
         updateCategoryResponse.setMessage(localizationUtils.getLocalizedMessage(MessageKeys.UPDATE_CATEGORY_SUCCESSFULLY));
         return ResponseEntity.ok(updateCategoryResponse);
     }
-
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteCategory(@PathVariable Long id){
+    public ResponseEntity<String> deleteCategory(@PathVariable Long id) {
         categoryService.deleteCategory(id);
         return ResponseEntity.ok(localizationUtils.getLocalizedMessage(MessageKeys.DELETE_CATEGORY_SUCCESSFULLY));
     }
 }
+

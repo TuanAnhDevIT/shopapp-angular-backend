@@ -42,10 +42,10 @@ public class User extends BaseEntity implements UserDetails {
     private Date dateOfBirth;
 
     @Column(name = "facebook_account_id")
-    private Integer facebookAccountId;
+    private int facebookAccountId;
 
     @Column(name = "google_account_id")
-    private Integer googleAccountId;
+    private int googleAccountId;
 
     @ManyToOne
     @JoinColumn(name = "role_id")
@@ -55,7 +55,7 @@ public class User extends BaseEntity implements UserDetails {
     public Collection<? extends GrantedAuthority> getAuthorities() {
         List<SimpleGrantedAuthority> authorityList = new ArrayList<>();
         authorityList.add(new SimpleGrantedAuthority("ROLE_"+getRole().getName().toUpperCase()));
-//        authorityList.add(new SimpleGrantedAuthority("ROLE_USER"));
+        //authorityList.add(new SimpleGrantedAuthority("ROLE_ADMIN"));
 
         return authorityList;
     }
