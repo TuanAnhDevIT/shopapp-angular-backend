@@ -41,7 +41,7 @@ public class Order {
     private String note;
 
     @Column(name="order_date")
-    private Date orderDate;
+    private LocalDate orderDate;
 
     @Column(name = "status")
     private String status;
@@ -70,5 +70,4 @@ public class Order {
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonManagedReference
     private List<OrderDetail> orderDetails;
-
 }

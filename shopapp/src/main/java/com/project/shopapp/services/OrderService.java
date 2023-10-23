@@ -43,7 +43,7 @@ public class OrderService implements IOrderService{
         Order order = new Order();
         modelMapper.map(orderDTO, order);
         order.setUser(user);
-        order.setOrderDate(new Date());//lấy thời điểm hiện tại
+        order.setOrderDate(LocalDate.now());//lấy thời điểm hiện tại
         order.setStatus(OrderStatus.PENDING);
         //Kiểm tra shipping date phải >= ngày hôm nay
         LocalDate shippingDate = orderDTO.getShippingDate() == null
@@ -88,7 +88,8 @@ public class OrderService implements IOrderService{
 
     @Override
     public Order getOrder(Long id) {
-        return orderRepository.findById(id).orElse(null);
+        Order selectedOrder = orderRepository.findById(id).orElse(null);
+        return selectedOrder;
     }
 
     @Override
