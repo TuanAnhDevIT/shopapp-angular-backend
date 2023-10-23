@@ -110,8 +110,8 @@ public class WebSecurityConfig {
                                     String.format("%s/uploads/**", apiPrefix)).permitAll()
 
 
-//                            .anyRequest().authenticated();
-                    .anyRequest().permitAll();
+                            .anyRequest().authenticated();
+//                    .anyRequest().permitAll();
 
                 })
                 .csrf(AbstractHttpConfigurer::disable);

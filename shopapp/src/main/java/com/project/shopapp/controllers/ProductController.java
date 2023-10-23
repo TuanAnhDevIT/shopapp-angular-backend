@@ -36,6 +36,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("${api.prefix}/products")
+//@RequestMapping("localhost:8088/v1/api/products")
 @RequiredArgsConstructor
 public class ProductController {
     private final IProductService productService;
@@ -110,7 +111,7 @@ public class ProductController {
     @GetMapping("/images/{imageName}")
     public ResponseEntity<?> viewImage(@PathVariable String imageName) {
         try {
-            java.nio.file.Path imagePath = Paths.get("/Users/dangtrantuananh/WorkSpace/Qkit_training/Qkit-Udemy-ShopApp/fullstack-shopapp/shopapp-backend-tuananh/uploads/"+imageName);
+            java.nio.file.Path imagePath = Paths.get("uploads/"+imageName);
             UrlResource resource = new UrlResource(imagePath.toUri());
 
 
@@ -125,7 +126,7 @@ public class ProductController {
                 return ResponseEntity.ok()
                         .contentType(MediaType.IMAGE_JPEG)
                         .body(new UrlResource(Paths.get("uploads/notfound.jpg").toUri()));
-                //return ResponseEntity.notFound().build();
+//                return ResponseEntity.notFound().build();
             }
         } catch (Exception e) {
             return ResponseEntity.notFound().build();
