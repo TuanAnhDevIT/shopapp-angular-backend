@@ -1,5 +1,6 @@
 package com.project.shopapp.controllers;
 
+import com.project.shopapp.models.Role;
 import com.project.shopapp.models.User;
 import com.project.shopapp.responses.LoginResponse;
 import com.project.shopapp.responses.RegisterResponse;
@@ -71,7 +72,7 @@ public class UserController {
             String token = userService.login(
                     userLoginDTO.getPhoneNumber(),
                     userLoginDTO.getPassword(),
-                    userLoginDTO.getRoleId()
+                    userLoginDTO.getRoleId() == null ? 1 : userLoginDTO.getRoleId()
             );
             // Trả về token trong response
             return ResponseEntity.ok(LoginResponse.builder()

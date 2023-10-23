@@ -106,9 +106,12 @@ public class WebSecurityConfig {
                             .requestMatchers(DELETE,
                                     String.format("%s/order_details/**", apiPrefix)).hasRole(Role.ADMIN)
 
+                            .requestMatchers(GET,
+                                    String.format("%s/uploads/**", apiPrefix)).permitAll()
 
-                            .anyRequest().authenticated();
-                    //.anyRequest().permitAll();
+
+//                            .anyRequest().authenticated();
+                    .anyRequest().permitAll();
 
                 })
                 .csrf(AbstractHttpConfigurer::disable);

@@ -110,9 +110,13 @@ public class ProductController {
     @GetMapping("/images/{imageName}")
     public ResponseEntity<?> viewImage(@PathVariable String imageName) {
         try {
-            java.nio.file.Path imagePath = Paths.get("uploads/"+imageName);
+            java.nio.file.Path imagePath = Paths.get("/Users/dangtrantuananh/WorkSpace/Qkit_training/Qkit-Udemy-ShopApp/fullstack-shopapp/shopapp-backend-tuananh/uploads/"+imageName);
             UrlResource resource = new UrlResource(imagePath.toUri());
 
+
+//            return ResponseEntity.ok()
+//                        .contentType(MediaType.IMAGE_JPEG)
+//                        .body(resource);
             if (resource.exists()) {
                 return ResponseEntity.ok()
                         .contentType(MediaType.IMAGE_JPEG)
